@@ -1,20 +1,23 @@
 from PyQt5.QtCore import QStringListModel, Qt
 from PyQt5.QtGui import QIcon, QPalette, QColor, QCursor
-from PyQt5.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QFontComboBox,
+from PyQt5.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QFontComboBox, QMdiSubWindow,
                              QPushButton, QSizePolicy,
                              QTabWidget, QTextEdit,
-                             QVBoxLayout, QWidget, QListView, QSplitter, QAction, QMainWindow, QDialog)
+                             QVBoxLayout, QWidget, QListView, QSplitter, QAction, QMainWindow, QDialog, QDesktopWidget,
+                             QMdiArea)
 
 from java_code_view import PyJavaCode
 from jmethod import PyJavaMethod
 
-
 class KOWRaidEditor(QMainWindow):
-    def __init__(self):
-        super(KOWRaidEditor, self).__init__()
+    def __init__(self, parent= None):
+        super(KOWRaidEditor, self).__init__(parent)
 
         self.setWindowTitle("Raid Editor v0.1")
-        self.setGeometry(100, 100, 960, 640)
+        self.setGeometry(100, 100, 1280, 960) #changed basic geom to 1280*960
+        self.center()
+        self.mdi = QMdiArea()
+        self.setCentralWidget(self.mdi)
 
         # todo: file import/export system 추가 필요
         self.init_ui()
@@ -36,7 +39,13 @@ class KOWRaidEditor(QMainWindow):
         central_widget = QWidget()
         central_widget.setLayout(main_layout)
 
-        self.setCentralWidget(central_widget)
+        #self.setCentralWidget(central_widget) // central widget 교체
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def test_data(self):
         self._methods.append(PyJavaMethod("test1", "sfsfsfs"))
@@ -51,7 +60,7 @@ class KOWRaidEditor(QMainWindow):
         act_newfile = QAction(QIcon('newfile.png'), '새로운 기사', self)
         act_newfile.setShortcut('Ctrl+N')
         act_newfile.setStatusTip('Create New File')
-        #act_newfile.triggered.connect(self.new_windows)
+        act_newfile.triggered.connect(self.new_windows)
         # todo: link action creating new document
 
         act_openfile = QAction(QIcon('openfile.png'), '기사 불러오기', self)
@@ -101,6 +110,14 @@ class KOWRaidEditor(QMainWindow):
 
     def export_java(self):
         return
+    def new_windows(self):
+        sub = QMdiSubWindow()
+        sub.setWidget(QTextEdit())
+        sub.setWindowTitle("New Article")
+        sub.setGeometry(100, 100, 600, 320)
+
+        self.mdi.addSubWindow(sub)
+        sub.show()
 
     def create_top_group_box(self):
         top_splitter = QSplitter()

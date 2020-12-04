@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QStringListModel, Qt
 from PyQt5.QtGui import QIcon, QPalette, QColor, QCursor
-from PyQt5.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
+from PyQt5.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QFontComboBox,
                              QPushButton, QSizePolicy,
                              QTabWidget, QTextEdit,
                              QVBoxLayout, QWidget, QListView, QSplitter, QAction, QMainWindow, QDialog)
@@ -48,6 +48,20 @@ class KOWRaidEditor(QMainWindow):
 
     def init_ui(self):
         # menu bar
+        act_newfile = QAction(QIcon('newfile.png'), '새로운 기사', self)
+        act_newfile.setShortcut('Ctrl+N')
+        act_newfile.setStatusTip('Create New File')
+        #act_newfile.triggered.connect(self.new_windows)
+        # todo: link action creating new document
+
+        act_openfile = QAction(QIcon('openfile.png'), '기사 불러오기', self)
+        act_openfile.setShortcut('Ctrl+O')
+        act_openfile.setStatusTip('Open Existing Article')
+
+        act_savefile = QAction(QIcon('savefile.png'), '기사 저장하기', self)
+        act_savefile.setShortcut('Ctrl+S')
+        act_savefile.setStatusTip('Save Current Article')
+
         act_export = QAction(QIcon('export.png'), '&Export', self)
         act_export.setShortcut('Ctrl+E')
         act_export.setStatusTip('Export to Java SourceCode')
@@ -59,14 +73,28 @@ class KOWRaidEditor(QMainWindow):
         act_import.triggered.connect(self.import_lua)
 
         status_bar = self.statusBar()
-
+        status_bar.showMessage('글자 수 표시 장소')
         menu_bar = self.menuBar()
         menu_bar.setNativeMenuBar(False)
         print(menu_bar.height())
 
         menu_file = menu_bar.addMenu('&File')
+        menu_file.addAction(act_newfile)
+        menu_file.addAction(act_openfile)
         menu_file.addAction(act_export)
         menu_file.addAction(act_import)
+
+        #tool bar
+        fontbox = QFontComboBox(self)
+        fontbox.InsertPolicy()
+        fontbox.setMinimumContentsLength(3)
+
+        format_bar = self.addToolBar('Format')
+        format_bar.addAction(act_newfile)
+        format_bar.addAction(act_openfile)
+        format_bar.addAction(act_savefile)
+        format_bar.addSeparator()
+        format_bar.addWidget(fontbox)
 
     def import_lua(self):
         return
